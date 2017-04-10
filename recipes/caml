@@ -1,1 +1,2 @@
+;; CANNOT use minority type, because multiple libraries
 (caml :fetcher svn :url "https://caml.inria.fr/svn/ocaml/trunk/emacs/")

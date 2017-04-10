@@ -1,3 +1,4 @@
+;; CANNOT use minority type, because multiple files
 (confluence
  :fetcher svn
  :url "https://svn.code.sf.net/p/confluence-el/code/trunk/"
