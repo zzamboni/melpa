@@ -14,7 +14,6 @@ sudo ${SUDOENV} apt-get -y install \
     cvs \
     darcs \
     emacs24 emacs24-el emacs24-common-non-dfsg \
-    fossil \
     git \
     make \
     mercurial \

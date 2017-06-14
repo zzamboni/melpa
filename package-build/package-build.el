@@ -429,36 +429,6 @@ A number as third arg means request confirmation if NEWNAME already exists."
 \\( \\|[0-9]\\)[0-9] [0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\} \
 [A-Za-z]\\{3\\} [0-9]\\{4\\}\\)")))))
 
-;;;; Fossil
-
-(defun package-build--fossil-repo (dir)
-  "Get the current fossil repo for DIR."
-  (package-build--run-process-match "\\(.*\\)" dir "fossil" "remote-url"))
-
-(defun package-build--checkout-fossil (name config dir)
-  "Check package NAME with config CONFIG out of fossil into DIR."
-  (unless package-build-stable
-    (let ((repo (plist-get config :url)))
-      (with-current-buffer (get-buffer-create "*package-build-checkout*")
-        (cond
-         ((and (or (file-exists-p (expand-file-name ".fslckout" dir))
-                   (file-exists-p (expand-file-name "_FOSSIL_" dir)))
-               (string-equal (package-build--fossil-repo dir) repo))
-          (package-build--princ-exists dir)
-          (package-build--run-process dir "fossil" "update"))
-         (t
-          (when (file-exists-p dir)
-            (delete-directory dir t))
-          (package-build--princ-checkout repo dir)
-          (make-directory dir)
-          (package-build--run-process dir "fossil" "clone" repo "repo.fossil")
-          (package-build--run-process dir "fossil" "open" "repo.fossil")))
-        (package-build--run-process dir "fossil" "timeline" "-n" "1" "-t" "ci")
-        (or (package-build--find-parse-time "\
-=== \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\} ===\n\
-[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}\\) ")
-            (error "No valid timestamps found!"))))))
-
 ;;;; Svn
 
 (defun package-build--svn-repo (dir)
@@ -803,8 +773,6 @@ Optionally PRETTY-PRINT the data."
          "--exclude=CVS"
          "--exclude=.git"
          "--exclude=_darcs"
-         "--exclude=.fslckout"
-         "--exclude=_FOSSIL_"
          "--exclude=.bzr"
          "--exclude=.hg"
          (or (mapcar (lambda (fn) (concat dir "/" fn)) files) (list dir))))
