@@ -386,49 +386,6 @@ A number as third arg means request confirmation if NEWNAME already exists."
         (car (nreverse (sort (mapcar 'package-build--grab-wiki-file files)
                              'string-lessp)))))))
 
-;;;; Darcs
-
-(defun package-build--darcs-repo (dir)
-  "Get the current darcs repo for DIR."
-  (package-build--run-process-match "Default Remote: \\(.*\\)"
-                                    dir "darcs" "show" "repo"))
-
-(defun package-build--checkout-darcs (name config dir)
-  "Check package NAME with config CONFIG out of darcs into DIR."
-  (let ((repo (plist-get config :url)))
-    (with-current-buffer (get-buffer-create "*package-build-checkout*")
-      (cond
-       ((and (file-exists-p (expand-file-name "_darcs" dir))
-             (string-equal (package-build--darcs-repo dir) repo))
-        (package-build--princ-exists dir)
-        (package-build--run-process dir "darcs" "pull" "--all"))
-       (t
-        (when (file-exists-p dir)
-          (delete-directory dir t))
-        (package-build--princ-checkout repo dir)
-        (package-build--run-process nil "darcs" "get" repo dir)))
-      (if package-build-stable
-          (let* ((min-bound (goto-char (point-max)))
-                 (tag-version
-                  (and (package-build--run-process dir "darcs" "show" "tags")
-                       (or (package-build--find-version-newest
-                            (or (plist-get config :version-regexp)
-                                package-build-version-regexp)
-                            min-bound)
-                           (error "No valid stable versions found for %s" name)))))
-            (package-build--run-process dir "darcs" "obliterate"
-                                        "--all" "--from-tag"
-                                        (cadr tag-version))
-            ;; Return the parsed version as a string
-            (package-version-join (car tag-version)))
-        (apply 'package-build--run-process
-               dir "darcs" "changes" "--max-count" "1"
-               (package-build--expand-source-file-list dir config))
-        (package-build--find-parse-time "\
-\\([a-zA-Z]\\{3\\} [a-zA-Z]\\{3\\} \
-\\( \\|[0-9]\\)[0-9] [0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\} \
-[A-Za-z]\\{3\\} [0-9]\\{4\\}\\)")))))
-
 ;;;; Svn
 
 (defun package-build--svn-repo (dir)
@@ -726,7 +683,6 @@ Optionally PRETTY-PRINT the data."
          "--exclude=.svn"
          "--exclude=CVS"
          "--exclude=.git"
-         "--exclude=_darcs"
          "--exclude=.hg"
          (or (mapcar (lambda (fn) (concat dir "/" fn)) files) (list dir))))
 
