@@ -608,52 +608,6 @@ Return a cons cell whose `car' is the root and whose `cdr' is the repository."
   (let ((url (format "https://gitlab.com/%s.git" (plist-get config :repo))))
     (package-build--checkout-git name (plist-put (copy-sequence config) :url url) dir)))
 
-;;;; Bzr
-
-(defun package-build--bzr-repo (dir)
-  "Get the current bzr repo for DIR."
-  (package-build--run-process-match "parent branch: \\(.*\\)" dir "bzr" "info"))
-
-(defun package-build--checkout-bzr (name config dir)
-  "Check package NAME with config CONFIG out of bzr into DIR."
-  (let ((repo (package-build--run-process-match
-               "\\(?:branch root\\|repository branch\\): \\(.*\\)"
-               nil "bzr" "info" (plist-get config :url))))
-    (with-current-buffer (get-buffer-create "*package-build-checkout*")
-      (goto-char (point-max))
-      (cond
-       ((and (file-exists-p (expand-file-name ".bzr" dir))
-             (string-equal (package-build--bzr-repo dir) repo))
-        (package-build--princ-exists dir)
-        (package-build--run-process dir "bzr" "merge" "--force"))
-       (t
-        (when (file-exists-p dir)
-          (delete-directory dir t))
-        (package-build--princ-checkout repo dir)
-        (package-build--run-process nil "bzr" "branch" repo dir)))
-      (if package-build-stable
-          (let ((bound (goto-char (point-max)))
-                (regexp (or (plist-get config :version-regexp)
-                            package-build-version-regexp))
-                tag-version)
-            (package-build--run-process dir "bzr" "tags")
-            (goto-char bound)
-            (ignore-errors (while (re-search-forward "\\ +.*")
-                             (replace-match "")))
-            (setq tag-version
-                  (or (package-build--find-version-newest regexp bound)
-                      (error "No valid stable versions found for %s" name)))
-            (package-build--run-process dir
-                                        "bzr" "revert" "-r"
-                                        (concat "tag:" (cadr tag-version)))
-            ;; Return the parsed version as a string
-            (package-version-join (car tag-version)))
-        (apply 'package-build--run-process dir "bzr" "log" "-l1"
-               (package-build--expand-source-file-list dir config))
-        (package-build--find-parse-time "\
-\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\} \
-[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}\\( [+-][0-9]\\{4\\}\\)?\\)")))))
-
 ;;;; Hg
 
 (defun package-build--hg-repo (dir)
@@ -773,7 +727,6 @@ Optionally PRETTY-PRINT the data."
          "--exclude=CVS"
          "--exclude=.git"
          "--exclude=_darcs"
-         "--exclude=.bzr"
          "--exclude=.hg"
          (or (mapcar (lambda (fn) (concat dir "/" fn)) files) (list dir))))
 
@@ -1492,7 +1445,7 @@ If FILE-NAME is not specified, the default archive-contents file is used."
    (list (intern (read-string "Package name: "))
          (intern (completing-read "Fetcher: "
                                   (list "github" "gitlab" "bitbucket"
-                                        "git" "wiki" "bzr" "hg" "cvs" "svn")
+                                        "git" "wiki" "hg" "cvs" "svn")
                                   nil t nil nil "github"))))
   (let ((recipe-file (expand-file-name (symbol-name name)
                                        package-build-recipes-dir)))

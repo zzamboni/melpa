@@ -9,7 +9,6 @@ cd ${HOME}
 sudo ${SUDOENV} apt-get -y update
 sudo ${SUDOENV} apt-get -y upgrade
 sudo ${SUDOENV} apt-get -y install \
-    bzr \
     curl \
     cvs \
     darcs \
