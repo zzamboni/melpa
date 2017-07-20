@@ -10,7 +10,6 @@ sudo ${SUDOENV} apt-get -y update
 sudo ${SUDOENV} apt-get -y upgrade
 sudo ${SUDOENV} apt-get -y install \
     curl \
-    cvs \
     emacs24 emacs24-el emacs24-common-non-dfsg \
     git \
     make \

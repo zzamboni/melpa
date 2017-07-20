@@ -105,22 +105,20 @@ the following form (`[...]` denotes optional or conditional values),
 
 ```lisp
 (<package-name>
- :fetcher [git|github|gitlab|bitbucket|hg|svn|cvs|wiki]
+ :fetcher [git|github|gitlab|bitbucket|hg|svn|wiki]
  [:url "<repo url>"]
  [:repo "github-gitlab-or-bitbucket-user/repo-name"]
  [:version-regexp "<regexp>"]
- [:module "cvs-module"]
  [:files ("<file1>" ...)])
 ```
 
 - `package-name`
 a lisp symbol that has the same name as the package being specified.
 
-- `:fetcher` (one of `git, github, gitlab, bitbucket, hg, svn, cvs, wiki`) specifies the type of repository that `:url`
+- `:fetcher` (one of `git, github, gitlab, bitbucket, hg, svn, wiki`) specifies the type of repository that `:url`
 points to. Right now package-build supports [git][git],
 [github][github], [gitlab][gitlab], [bitbucket][bitbucket],
-[mercurial (hg)][hg], [subversion (svn)][svn],
-[cvs][cvs], and
+[mercurial (hg)][hg], [subversion (svn)][svn], and
 [EmacsWiki (deprecated)][emacswiki] as possible mechanisms for checking out
 the repository. (Note: `bitbucket` assumes `hg`: `git` repos hosted on
 bitbucket should use the `git` fetcher.)
@@ -139,7 +137,7 @@ differs from the package name being built.
 
 - `:url`
 specifies the URL of the version control repository. *required for
-the `git`, `hg`, `svn` and `cvs` fetchers.*
+the `git`, `hg`, and `svn` fetchers.*
 
 - `:repo` specifies the github/gitlab/bitbucket repository and is of the form
 `user/repo-name`. *required for the `github`, `gitlab`, and `bitbucket` fetchers*.
@@ -162,10 +160,6 @@ it adds the "origin/" prefix automatically.
   "OTP-18.1.5", we might add `:version-regexp "[^0-9]*\\(.*\\)"` to
   strip the "OTP-" prefix.  The captured portion of the regexp must be
   parseable by Emacs' `version-to-list` function.
-
-- `:module`
-specifies the module of a CVS repository to check out.  Defaults to to
-`package-name`.  Only used with `:fetcher cvs`, and otherwise ignored.
 
 - `:files` optional property specifying the elisp and info files used to build the
 package. Please do not override this if the default value (below) is adequate, which
@@ -199,7 +193,6 @@ subdirectories to keep packaging simple.
 [bitbucket]: https://bitbucket.org/
 [hg]: https://www.mercurial-scm.org/
 [svn]: http://subversion.apache.org/
-[cvs]: http://www.nongnu.org/cvs/
 [emacswiki]: http://www.emacswiki.org/
 
 
