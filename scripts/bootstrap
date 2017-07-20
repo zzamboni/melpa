@@ -16,7 +16,6 @@ sudo ${SUDOENV} apt-get -y install \
     mercurial \
     nginx \
     runit \
-    subversion \
     texinfo \
     tmux
 

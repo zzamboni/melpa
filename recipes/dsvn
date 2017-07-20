@@ -1,1 +1,1 @@
-(dsvn :fetcher github :repo "emacsmirror/dsvn")
+(dsvn :fetcher github :repo "emacsmirror/dsvn" :files ("dsvn.el"))

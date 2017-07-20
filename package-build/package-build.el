@@ -386,36 +386,6 @@ A number as third arg means request confirmation if NEWNAME already exists."
         (car (nreverse (sort (mapcar 'package-build--grab-wiki-file files)
                              'string-lessp)))))))
 
-;;;; Svn
-
-(defun package-build--svn-repo (dir)
-  "Get the current svn repo for DIR."
-  (package-build--run-process-match "URL: \\(.*\\)" dir "svn" "info"))
-
-(defun package-build--checkout-svn (name config dir)
-  "Check package NAME with config CONFIG out of svn into DIR."
-  (unless package-build-stable
-    (with-current-buffer (get-buffer-create "*package-build-checkout*")
-      (let ((repo (package-build--trim (plist-get config :url) ?/))
-            (bound (goto-char (point-max))))
-        (cond
-         ((and (file-exists-p (expand-file-name ".svn" dir))
-               (string-equal (package-build--svn-repo dir) repo))
-          (package-build--princ-exists dir)
-          (package-build--run-process dir "svn" "up"))
-         (t
-          (when (file-exists-p dir)
-            (delete-directory dir t))
-          (package-build--princ-checkout repo dir)
-          (package-build--run-process nil "svn" "checkout" repo dir)))
-        (apply 'package-build--run-process dir "svn" "info"
-               (package-build--expand-source-file-list dir config))
-        (or (package-build--find-parse-time-newest "\
-Last Changed Date: \\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\} \
-[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}\\( [+-][0-9]\\{4\\}\\)?\\)"
-             bound)
-            (error "No valid timestamps found!"))))))
-
 ;;;; Git
 
 (defun package-build--git-repo (dir)

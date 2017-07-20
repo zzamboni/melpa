@@ -105,7 +105,7 @@ the following form (`[...]` denotes optional or conditional values),
 
 ```lisp
 (<package-name>
- :fetcher [git|github|gitlab|bitbucket|hg|svn|wiki]
+ :fetcher [git|github|gitlab|bitbucket|hg|wiki]
  [:url "<repo url>"]
  [:repo "github-gitlab-or-bitbucket-user/repo-name"]
  [:version-regexp "<regexp>"]
@@ -115,10 +115,10 @@ the following form (`[...]` denotes optional or conditional values),
 - `package-name`
 a lisp symbol that has the same name as the package being specified.
 
-- `:fetcher` (one of `git, github, gitlab, bitbucket, hg, svn, wiki`) specifies the type of repository that `:url`
+- `:fetcher` (one of `git, github, gitlab, bitbucket, hg, wiki`) specifies the type of repository that `:url`
 points to. Right now package-build supports [git][git],
 [github][github], [gitlab][gitlab], [bitbucket][bitbucket],
-[mercurial (hg)][hg], [subversion (svn)][svn], and
+[mercurial (hg)][hg], and
 [EmacsWiki (deprecated)][emacswiki] as possible mechanisms for checking out
 the repository. (Note: `bitbucket` assumes `hg`: `git` repos hosted on
 bitbucket should use the `git` fetcher.)
@@ -137,7 +137,7 @@ differs from the package name being built.
 
 - `:url`
 specifies the URL of the version control repository. *required for
-the `git`, `hg`, and `svn` fetchers.*
+the `git`, and `hg` fetchers.*
 
 - `:repo` specifies the github/gitlab/bitbucket repository and is of the form
 `user/repo-name`. *required for the `github`, `gitlab`, and `bitbucket` fetchers*.
@@ -192,7 +192,6 @@ subdirectories to keep packaging simple.
 [gitlab]: https://gitlab.com/
 [bitbucket]: https://bitbucket.org/
 [hg]: https://www.mercurial-scm.org/
-[svn]: http://subversion.apache.org/
 [emacswiki]: http://www.emacswiki.org/
 
 
